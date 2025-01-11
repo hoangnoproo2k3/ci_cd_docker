@@ -1,62 +1,39 @@
-name: Basic CI/CD
+name: Docker Build and Push
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'backend/**'
-      - 'frontend/**'
+      - "backend/**"
+      - "frontend/**"
 
 jobs:
-  build-backend:
-    name: Build and Deploy Backend
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Docker image for backend
-        run: |
-          cd backend
-          docker build --no-cache -t backend .
+      # Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Stop and remove old backend container
-        run: |
-          docker stop backend_container || true
-          docker rm backend_container || true
+      # Build và push backend
+      - name: Build and push backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
 
-      - name: Run the new backend container
-        run: |
-          docker run -d --name backend_container -p 5002:5000 backend
-
-      - name: Check backend container status
-        run: |
-          docker ps
-
-  build-frontend:
-    name: Build and Deploy Frontend
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Build Docker image for frontend
-        run: |
-          cd frontend
-          docker build --no-cache -t frontend .
-
-      - name: Stop and remove old frontend container
-        run: |
-          docker stop frontend_container || true
-          docker rm frontend_container || true
-
-      - name: Run the new frontend container
-        run: |
-          docker run -d --name frontend_container -p 3000:3000 frontend
-
-      - name: Check frontend container status
-        run: |
-          docker ps
+      # Build và push frontend
+      - name: Build and push frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
