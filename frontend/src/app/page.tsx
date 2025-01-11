@@ -12,7 +12,7 @@ export default function Home() {
           height={38}
           priority
         />
-        cicd fe
+        ole le tiếp tếppppp
       </main>
     </div>
   );
