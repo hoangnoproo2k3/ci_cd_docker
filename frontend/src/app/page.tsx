@@ -12,7 +12,7 @@ export default function Home() {
           height={38}
           priority
         />
-        Oh shit hehhe này
+        Oh shit hehhe này hhhhhehehh
       </main>
     </div>
   );
