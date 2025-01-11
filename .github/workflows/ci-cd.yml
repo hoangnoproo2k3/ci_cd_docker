@@ -9,7 +9,7 @@ jobs:
   build-backend:
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'backend') || github.event_name == 'push' && github.event.changes[0].path startsWith('backend/'
+    if: contains(github.event.head_commit.message, 'backend') || github.event_name == 'push' && contains(github.event.head_commit.message, 'backend/')
 
     steps:
       # Bước 1: Checkout code
@@ -35,7 +35,7 @@ jobs:
   build-frontend:
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'frontend') || github.event_name == 'push' && github.event.changes[0].path startsWith('frontend/'
+    if: contains(github.event.head_commit.message, 'frontend') || github.event_name == 'push' && contains(github.event.head_commit.message, 'frontend/')
 
     steps:
       # Bước 1: Checkout code
