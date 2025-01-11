@@ -6,9 +6,10 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  build-backend:
+    name: Build and Deploy Backend
     runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'backend') || github.event_name == 'push' && github.event.changes[0].path startsWith('backend/'
 
     steps:
       # Bước 1: Checkout code
@@ -26,14 +27,33 @@ jobs:
           docker build -t my-backend .
           docker run -d -p 5002:5000 my-backend
 
-      # Bước 4: Build và chạy Docker cho frontend
+      # Bước 4: Kiểm tra trạng thái của container
+      - name: Check container status
+        run: |
+          docker ps
+
+  build-frontend:
+    name: Build and Deploy Frontend
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'frontend') || github.event_name == 'push' && github.event.changes[0].path startsWith('frontend/'
+
+    steps:
+      # Bước 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Bước 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Bước 3: Build và chạy Docker cho frontend
       - name: Build and run frontend Docker
         run: |
           cd frontend
           docker build -t my-frontend .
           docker run -d -p 3000:3000 my-frontend
 
-      # Bước 5: Kiểm tra trạng thái của các container
+      # Bước 4: Kiểm tra trạng thái của container
       - name: Check container status
         run: |
           docker ps
