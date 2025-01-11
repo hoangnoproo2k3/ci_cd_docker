@@ -12,21 +12,25 @@ jobs:
   build-backend:
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'backend') # Chỉ chạy khi có thay đổi trong backend/
 
     steps:
-      # Bước 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Bước 2: Build Docker image cho backend
-      - name: Build and run backend Docker
+      - name: Build Docker image for backend
         run: |
           cd backend
-          docker build -t backend .
-          docker run -d -p 5002:5000 backend
+          docker build --no-cache -t backend .
 
-      # Bước 3: Kiểm tra trạng thái của container backend
+      - name: Stop and remove old backend container
+        run: |
+          docker stop backend_container || true
+          docker rm backend_container || true
+
+      - name: Run the new backend container
+        run: |
+          docker run -d --name backend_container -p 5002:5000 backend
+
       - name: Check backend container status
         run: |
           docker ps
@@ -34,21 +38,25 @@ jobs:
   build-frontend:
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'frontend') # Chỉ chạy khi có thay đổi trong frontend/
 
     steps:
-      # Bước 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Bước 2: Build Docker image cho frontend
-      - name: Build and run frontend Docker
+      - name: Build Docker image for frontend
         run: |
           cd frontend
-          docker build -t frontend .
-          docker run -d -p 3000:3000 frontend
+          docker build --no-cache -t frontend .
 
-      # Bước 3: Kiểm tra trạng thái của container frontend
+      - name: Stop and remove old frontend container
+        run: |
+          docker stop frontend_container || true
+          docker rm frontend_container || true
+
+      - name: Run the new frontend container
+        run: |
+          docker run -d --name frontend_container -p 3000:3000 frontend
+
       - name: Check frontend container status
         run: |
           docker ps
